@@ -140,8 +140,12 @@ class Nori
         t = advanced_typecasting(t) if t.is_a?(String) && @options[:advanced_typecasting]
 
         if t.is_a?(String)
-          t = StringWithAttributes.new(t)
-          t.attributes = attributes
+          if @options[:string_with_attributes_as_hash] && attributes.any?
+            t = { '#text' => t }.merge(attributes.transform_keys { |k| "@#{k}" })
+          else
+            t = StringWithAttributes.new(t)
+            t.attributes = attributes
+          end
         end
 
         return { name => t }

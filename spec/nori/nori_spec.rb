@@ -231,6 +231,20 @@ describe Nori do
           expect("some-string").not_to respond_to(:attributes)
           expect("some-string").not_to respond_to(:attributes=)
         end
+
+        it "returns hash with :string_with_attributes_as_hash option" do
+          xml =<<-XML
+            <opt>
+              <test attr="value" attr1="value1">Text</test>
+              <user login="grep">Gary R Epstein</user>
+              <user>Simon T Tyson</user>
+            </opt>
+          XML
+          @data = parse(xml, { string_with_attributes_as_hash: true })
+          expect(@data['opt']['test']).to eq({ '#text' => 'Text', '@attr' => 'value', '@attr1' => 'value1' })
+          expect(@data['opt']['user'][0]).to eq({ '#text' => 'Gary R Epstein', '@login' => 'grep' })
+          expect(@data['opt']['user'][1]).to eq('Simon T Tyson')
+        end
       end
 
       it "should typecast an integer" do
